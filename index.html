@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bốc Thăm</title>
+</head>
+
+<body>
+    <!DOCTYPE html>
+    <html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Slot Machine</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+        <style>
+            .slot-reel {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: start;
+                height: 80px;
+                width: 100%;
+                overflow: hidden;
+                border: 4px solid #FBBF24;
+                border-radius: 10px;
+                background-color: #1F2937;
+            }
+
+            .reel-content {
+                display: flex;
+                flex-direction: column;
+                position: relative;
+            }
+
+            .reel-item {
+                font-size: 1.5rem;
+                font-weight: bold;
+                color: #FBBF24;
+                text-align: center;
+                height: 80px;
+                line-height: 80px;
+            }
+
+            .custom-file-input {
+                display: none;
+            }
+
+            .file-label {
+                display: inline-block;
+                padding: 0.5rem 1rem;
+                background-color: #FBBF24;
+                color: #1F2937;
+                font-weight: bold;
+                border-radius: 5px;
+                cursor: pointer;
+                transition: background-color 0.3s ease;
+            }
+
+            .file-label:hover {
+                background-color: #FFD700;
+            }
+
+            .hidden {
+                display: none;
+            }
+        </style>
+    </head>
+
+    <body class="bg-gray-900 text-white flex items-center justify-center min-h-screen">
+        <div class="w-full max-w-lg p-6 bg-gray-800 rounded-lg shadow-lg">
+            <h1 class="text-3xl font-bold text-center mb-6 text-yellow-400">🎰 Spin Lucky 🎰</h1>
+
+            <label for="fileInput" id="fileLabel" class="file-label mb-4">Chọn tệp</label>
+            <input type="file" id="fileInput" class="custom-file-input" />
+
+            <div class="flex justify-center gap-4 mb-6">
+                <div id="reel1" class="slot-reel">
+                    <div class="reel-content">
+                    </div>
+                </div>
+            </div>
+
+            <button id="spinButton"
+                class="w-full py-3 bg-yellow-500 text-gray-900 font-bold rounded-lg hover:bg-yellow-400 transition duration-300 ease-in-out hidden">Spin</button>
+        </div>
+
+        <script src="./js/index.js"></script>
+    </body>
+
+    </html>
+</body>
+
+</html>
