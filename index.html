@@ -4,95 +4,173 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bốc Thăm</title>
+    <title>Slot Machine</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        .slot-reel {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: start;
+            height: 80px;
+            /* Adjusted height to fit one winner */
+            width: 100%;
+            overflow: hidden;
+            border: 4px solid #FBBF24;
+            border-radius: 10px;
+            background-color: #1F2937;
+        }
+
+        .reel-content {
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .reel-item {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #FBBF24;
+            text-align: center;
+            height: 80px;
+            line-height: 80px;
+        }
+
+        .custom-file-input {
+            display: none;
+        }
+
+        .file-label {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background-color: #FBBF24;
+            color: #1F2937;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .file-label:hover {
+            background-color: #FFD700;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
 </head>
 
-<body>
-    <!DOCTYPE html>
-    <html lang="en">
+<body class="bg-gray-900 text-white flex items-center justify-center min-h-screen">
+    <div class="w-full max-w-lg p-6 bg-gray-800 rounded-lg shadow-lg">
+        <h1 class="text-3xl font-bold text-center mb-6 text-yellow-400">🎰 Spin Lucky 🎰</h1>
 
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Slot Machine</title>
-        <script src="https://cdn.tailwindcss.com"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-        <style>
-            .slot-reel {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: start;
-                height: 80px;
-                width: 100%;
-                overflow: hidden;
-                border: 4px solid #FBBF24;
-                border-radius: 10px;
-                background-color: #1F2937;
-            }
+        <label for="fileInput" id="fileLabel" class="file-label mb-4">Chọn tệp</label>
+        <input type="file" id="fileInput" class="custom-file-input" />
 
-            .reel-content {
-                display: flex;
-                flex-direction: column;
-                position: relative;
-            }
-
-            .reel-item {
-                font-size: 1.5rem;
-                font-weight: bold;
-                color: #FBBF24;
-                text-align: center;
-                height: 80px;
-                line-height: 80px;
-            }
-
-            .custom-file-input {
-                display: none;
-            }
-
-            .file-label {
-                display: inline-block;
-                padding: 0.5rem 1rem;
-                background-color: #FBBF24;
-                color: #1F2937;
-                font-weight: bold;
-                border-radius: 5px;
-                cursor: pointer;
-                transition: background-color 0.3s ease;
-            }
-
-            .file-label:hover {
-                background-color: #FFD700;
-            }
-
-            .hidden {
-                display: none;
-            }
-        </style>
-    </head>
-
-    <body class="bg-gray-900 text-white flex items-center justify-center min-h-screen">
-        <div class="w-full max-w-lg p-6 bg-gray-800 rounded-lg shadow-lg">
-            <h1 class="text-3xl font-bold text-center mb-6 text-yellow-400">🎰 Spin Lucky 🎰</h1>
-
-            <label for="fileInput" id="fileLabel" class="file-label mb-4">Chọn tệp</label>
-            <input type="file" id="fileInput" class="custom-file-input" />
-
-            <div class="flex justify-center gap-4 mb-6">
-                <div id="reel1" class="slot-reel">
-                    <div class="reel-content">
-                    </div>
+        <div class="flex justify-center gap-4 mb-6">
+            <div id="reel1" class="slot-reel">
+                <div class="reel-content">
                 </div>
             </div>
-
-            <button id="spinButton"
-                class="w-full py-3 bg-yellow-500 text-gray-900 font-bold rounded-lg hover:bg-yellow-400 transition duration-300 ease-in-out hidden">Spin</button>
         </div>
 
-        <script src="./js/index.js"></script>
-    </body>
+        <button id="spinButton"
+            class="w-full py-3 bg-yellow-500 text-gray-900 font-bold rounded-lg hover:bg-yellow-400 transition duration-300 ease-in-out hidden">Spin</button>
+    </div>
 
-    </html>
+    <script>
+        let users = [];
+
+        document.getElementById('fileInput').addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const sheetName = workbook.SheetNames[0];
+                    const sheet = workbook.Sheets[sheetName];
+                    const json = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+                    // Parse Excel data, skipping the header row and unnecessary columns
+                    users = json.slice(2).map(row => ({
+                        id: row[1], // Mã nhân sự
+                        name: row[2], // Họ và tên
+                        position: row[3], // Chức danh
+                        department: row[4], // Bộ phận/ Phòng ban
+                        unit: row[5] // Đơn vị
+                    })).filter(user => user.id && user.name); // Filter valid rows
+
+                    document.getElementById('spinButton').classList.remove('hidden');
+                    document.getElementById('fileLabel').classList.add('hidden');
+                    document.getElementById('fileInput').classList.add('hidden');
+                };
+                reader.readAsArrayBuffer(file);
+            }
+        });
+
+        const reel1 = document.getElementById('reel1').querySelector('.reel-content');
+        const spinButton = document.getElementById('spinButton');
+
+        const spinSlot = () => {
+            if (users.length === 0) {
+                alert('No more users to spin for!');
+                return;
+            }
+
+            spinButton.disabled = true;
+            spinButton.textContent = "Spinning...";
+
+            // Clear existing reel content
+            reel1.innerHTML = '';
+
+            // Create a full reel of users, repeated for multiple spins
+            const fullReel = Array(20).fill(users).flat(); // Repeat users 20 times to ensure long spin
+            fullReel.forEach(user => {
+                const div = document.createElement('div');
+                div.className = 'reel-item';
+                div.textContent = user.name;
+                reel1.appendChild(div);
+            });
+
+            // Reset the transform to ensure consistent spinning
+            reel1.style.transition = 'none';
+            reel1.style.transform = 'translateY(0)';
+
+            // Start animation
+            setTimeout(() => {
+                const totalItems = fullReel.length;
+                const winnerIndex = Math.floor(Math.random() * users.length);
+                const spinDistance = (totalItems - users.length + winnerIndex) * -80; // Ensure consistent spin
+                reel1.style.transition = 'transform 4s cubic-bezier(0.25, 1, 0.5, 1)'; // Smooth and long animation
+                reel1.style.transform = `translateY(${spinDistance}px)`;
+
+                // Select a winner after animation ends
+                setTimeout(() => {
+                    const winner = users[winnerIndex];
+
+                    // Update the reel to show only the winner
+                    reel1.innerHTML = '';
+                    const winnerDiv = document.createElement('div');
+                    winnerDiv.className = 'reel-item';
+                    winnerDiv.textContent = winner.name;
+                    reel1.appendChild(winnerDiv);
+
+                    alert(`Winner: \nMã nhân sự: ${winner.id}\nHọ và tên: ${winner.name}\nChức danh: ${winner.position}\nBộ phận: ${winner.department}\nĐơn vị: ${winner.unit}`);
+
+                    // Remove winner from the users list
+                    users = users.filter(user => user.id !== winner.id);
+
+                    spinButton.disabled = false;
+                    spinButton.textContent = "Spin";
+                }, 4000); // Match animation duration
+            }, 50); // Ensure transform reset is applied
+        };
+
+        spinButton.addEventListener('click', spinSlot);
+    </script>
 </body>
 
 </html>
