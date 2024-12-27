@@ -14,7 +14,6 @@
             align-items: center;
             justify-content: start;
             height: 80px;
-            /* Adjusted height to fit one winner */
             width: 100%;
             overflow: hidden;
             border: 4px solid #FBBF24;
@@ -69,6 +68,27 @@
         <label for="fileInput" id="fileLabel" class="file-label mb-4">Chọn tệp</label>
         <input type="file" id="fileInput" class="custom-file-input" />
 
+        <div class="mb-4">
+            <label for="prizeSelect" class="block mb-2 font-bold text-yellow-400">Chọn giải thưởng:</label>
+            <select id="prizeSelect" class="w-full p-2 bg-gray-700 text-yellow-400 font-bold rounded-lg">
+                <option value="special1" data-count="1" data-prize="iPhone 16 Pro Max 256GB">Đặc biệt (1 giải) - iPhone
+                    16 Pro Max</option>
+                <option value="special2" data-count="1" data-prize="TV Sam Sung">Đặc biệt (1 giải) - TV Sam Sung
+                </option>
+                <option value="firstPrize" data-count="1" data-prize="Tủ lạnh">Giải nhất (1 giải) - Tủ lạnh</option>
+                <option value="secondPrize" data-count="2" data-prize="Máy hút bụi">Giải nhì (2 giải) - Máy hút bụi
+                </option>
+                <option value="thirdPrize" data-count="3" data-prize="Nồi chiên không dầu">Giải ba (3 giải) - Nồi chiên
+                    không dầu</option>
+                <option value="luckyPrize" data-count="3" data-prize="Sạc dự phòng">May mắn (3 giải) - Sạc dự phòng
+                </option>
+                <option value="fortunePrize" data-count="3" data-prize="Nồi cơm điện">Phát Tài (3 giải) - Nồi cơm điện
+                </option>
+                <option value="blessingPrize" data-count="4" data-prize="Bộ nồi SunHouse">Phát Lộc (4 giải) - Bộ nồi
+                    SunHouse</option>
+            </select>
+        </div>
+
         <div class="flex justify-center gap-4 mb-6">
             <div id="reel1" class="slot-reel">
                 <div class="reel-content">
@@ -77,11 +97,26 @@
         </div>
 
         <button id="spinButton"
-            class="w-full py-3 bg-yellow-500 text-gray-900 font-bold rounded-lg hover:bg-yellow-400 transition duration-300 ease-in-out hidden">Spin</button>
+            class="w-full py-3 bg-yellow-500 text-gray-900 font-bold rounded-lg hover:bg-yellow-400 transition duration-300 ease-in-out hidden">Đặc
+            biệt</button>
     </div>
 
     <script>
         let users = [];
+        const prizeData = {
+            special1: 1,
+            special2: 1,
+            firstPrize: 1,
+            secondPrize: 2,
+            thirdPrize: 3,
+            luckyPrize: 3,
+            fortunePrize: 3,
+            blessingPrize: 4
+        };
+
+        let currentPrize = "Đặc biệt";
+        let remainingSpins = 1; // Default spins for the first prize
+        let currentPrizeReward = "iPhone 16 Pro Max 256GB";
 
         document.getElementById('fileInput').addEventListener('change', (event) => {
             const file = event.target.files[0];
@@ -97,10 +132,10 @@
                     // Parse Excel data, skipping the header row and unnecessary columns
                     users = json.slice(2).map(row => ({
                         id: row[1], // Mã nhân sự
-                        name: row[2], // Họ và tên
-                        position: row[3], // Chức danh
-                        department: row[4], // Bộ phận/ Phòng ban
-                        unit: row[5] // Đơn vị
+                        name: row[2] || '', // Họ và tên
+                        position: row[3] || '', // Chức danh
+                        department: row[4] || '', // Bộ phận/ Phòng ban
+                        unit: row[5] || '' // Đơn vị
                     })).filter(user => user.id && user.name); // Filter valid rows
 
                     document.getElementById('spinButton').classList.remove('hidden');
@@ -113,15 +148,30 @@
 
         const reel1 = document.getElementById('reel1').querySelector('.reel-content');
         const spinButton = document.getElementById('spinButton');
+        const prizeSelect = document.getElementById('prizeSelect');
+
+        prizeSelect.addEventListener('change', (event) => {
+            const selectedOption = event.target.options[event.target.selectedIndex];
+            const prizeKey = selectedOption.value;
+            currentPrize = selectedOption.text.split(' - ')[0].split(' (')[0]; // Extract prize name
+            remainingSpins = prizeData[prizeKey]; // Get remaining spins from prizeData
+            currentPrizeReward = selectedOption.getAttribute('data-prize'); // Get prize reward
+            spinButton.textContent = remainingSpins > 0 ? currentPrize : `${currentPrize} đã hết`;
+            spinButton.disabled = remainingSpins <= 0;
+        });
 
         const spinSlot = () => {
+            if (remainingSpins <= 0) {
+                alert(`Hết lượt cho ${currentPrize}!`);
+                return;
+            }
+
             if (users.length === 0) {
                 alert('No more users to spin for!');
                 return;
             }
 
             spinButton.disabled = true;
-            spinButton.textContent = "Spinning...";
 
             // Clear existing reel content
             reel1.innerHTML = '';
@@ -131,7 +181,7 @@
             fullReel.forEach(user => {
                 const div = document.createElement('div');
                 div.className = 'reel-item';
-                div.textContent = user.name;
+                div.textContent = user.id; // Displaying Mã nhân sự
                 reel1.appendChild(div);
             });
 
@@ -155,16 +205,18 @@
                     reel1.innerHTML = '';
                     const winnerDiv = document.createElement('div');
                     winnerDiv.className = 'reel-item';
-                    winnerDiv.textContent = winner.name;
+                    winnerDiv.textContent = winner.id; // Displaying Mã nhân sự
                     reel1.appendChild(winnerDiv);
 
-                    alert(`Winner: \nMã nhân sự: ${winner.id}\nHọ và tên: ${winner.name}\nChức danh: ${winner.position}\nBộ phận: ${winner.department}\nĐơn vị: ${winner.unit}`);
+                    alert(`Winner of ${currentPrize}: \nMã nhân sự: ${winner.id}\nHọ và tên: ${winner.name || ''}\nChức danh: ${winner.position || ''}\nBộ phận: ${winner.department || ''}\nĐơn vị: ${winner.unit || ''}\nPhần thưởng: ${currentPrizeReward}`);
 
                     // Remove winner from the users list
                     users = users.filter(user => user.id !== winner.id);
 
-                    spinButton.disabled = false;
-                    spinButton.textContent = "Spin";
+                    remainingSpins -= 1; // Decrement remaining spins
+                    prizeData[prizeSelect.value] = remainingSpins; // Update prizeData
+                    spinButton.textContent = remainingSpins > 0 ? currentPrize : `${currentPrize} đã hết`;
+                    spinButton.disabled = remainingSpins <= 0;
                 }, 4000); // Match animation duration
             }, 50); // Ensure transform reset is applied
         };
