@@ -110,6 +110,10 @@
         </div>
     </div>
 
+    <audio id="spinAudio" src="https://sconnect.com.vn/wp-content/uploads/2024/01/Nhac-1.mp3" preload="auto"></audio>
+    <audio id="winAudio" src="https://cdn.pixabay.com/download/audio/2022/03/10/audio_c7990c71b9.mp3"
+        preload="auto"></audio>
+
     <script>
         let users = [];
         const prizeData = {
@@ -126,6 +130,9 @@
         let currentPrize = "Đặc biệt";
         let remainingSpins = 1;
         let currentPrizeReward = "iPhone 16 Pro Max 256GB";
+
+        const spinAudio = document.getElementById('spinAudio');
+        const winAudio = document.getElementById('winAudio');
 
         document.getElementById('fileInput').addEventListener('change', (event) => {
             const file = event.target.files[0];
@@ -182,6 +189,8 @@
                 return;
             }
 
+            spinAudio.play();
+
             spinButton.disabled = true;
 
             reel1.innerHTML = '';
@@ -212,6 +221,8 @@
                     winnerDiv.className = 'reel-item';
                     winnerDiv.textContent = winner.id;
                     reel1.appendChild(winnerDiv);
+
+                    winAudio.play();
 
                     winnerDetails.innerHTML = `
                         <p>Mã nhân sự: ${winner.id}</p>
