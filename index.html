@@ -101,6 +101,15 @@
             biệt</button>
     </div>
 
+    <div id="winnerModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+        <div class="bg-gray-800 p-6 rounded-lg text-center max-w-md w-full">
+            <h2 class="text-xl font-bold text-yellow-400 mb-4">🎉 Winner! 🎉</h2>
+            <p id="winnerDetails" class="text-white mb-6"></p>
+            <button id="closeModal"
+                class="px-4 py-2 bg-yellow-500 text-gray-900 font-bold rounded-lg hover:bg-yellow-400 transition">Close</button>
+        </div>
+    </div>
+
     <script>
         let users = [];
         const prizeData = {
@@ -115,7 +124,7 @@
         };
 
         let currentPrize = "Đặc biệt";
-        let remainingSpins = 1; // Default spins for the first prize
+        let remainingSpins = 1;
         let currentPrizeReward = "iPhone 16 Pro Max 256GB";
 
         document.getElementById('fileInput').addEventListener('change', (event) => {
@@ -129,14 +138,13 @@
                     const sheet = workbook.Sheets[sheetName];
                     const json = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
-                    // Parse Excel data, skipping the header row and unnecessary columns
                     users = json.slice(2).map(row => ({
-                        id: row[1], // Mã nhân sự
-                        name: row[2] || '', // Họ và tên
-                        position: row[3] || '', // Chức danh
-                        department: row[4] || '', // Bộ phận/ Phòng ban
-                        unit: row[5] || '' // Đơn vị
-                    })).filter(user => user.id && user.name); // Filter valid rows
+                        id: row[1],
+                        name: row[2] || '',
+                        position: row[3] || '',
+                        department: row[4] || '',
+                        unit: row[5] || ''
+                    })).filter(user => user.id && user.name);
 
                     document.getElementById('spinButton').classList.remove('hidden');
                     document.getElementById('fileLabel').classList.add('hidden');
@@ -149,13 +157,16 @@
         const reel1 = document.getElementById('reel1').querySelector('.reel-content');
         const spinButton = document.getElementById('spinButton');
         const prizeSelect = document.getElementById('prizeSelect');
+        const winnerModal = document.getElementById('winnerModal');
+        const winnerDetails = document.getElementById('winnerDetails');
+        const closeModal = document.getElementById('closeModal');
 
         prizeSelect.addEventListener('change', (event) => {
             const selectedOption = event.target.options[event.target.selectedIndex];
             const prizeKey = selectedOption.value;
-            currentPrize = selectedOption.text.split(' - ')[0].split(' (')[0]; // Extract prize name
-            remainingSpins = prizeData[prizeKey]; // Get remaining spins from prizeData
-            currentPrizeReward = selectedOption.getAttribute('data-prize'); // Get prize reward
+            currentPrize = selectedOption.text.split(' - ')[0].split(' (')[0];
+            remainingSpins = prizeData[prizeKey];
+            currentPrizeReward = selectedOption.getAttribute('data-prize');
             spinButton.textContent = remainingSpins > 0 ? currentPrize : `${currentPrize} đã hết`;
             spinButton.disabled = remainingSpins <= 0;
         });
@@ -173,55 +184,59 @@
 
             spinButton.disabled = true;
 
-            // Clear existing reel content
             reel1.innerHTML = '';
 
-            // Create a full reel of users, repeated for multiple spins
-            const fullReel = Array(20).fill(users).flat(); // Repeat users 20 times to ensure long spin
+            const fullReel = Array(20).fill(users).flat();
             fullReel.forEach(user => {
                 const div = document.createElement('div');
                 div.className = 'reel-item';
-                div.textContent = user.id; // Displaying Mã nhân sự
+                div.textContent = user.id;
                 reel1.appendChild(div);
             });
 
-            // Reset the transform to ensure consistent spinning
             reel1.style.transition = 'none';
             reel1.style.transform = 'translateY(0)';
 
-            // Start animation
             setTimeout(() => {
                 const totalItems = fullReel.length;
                 const winnerIndex = Math.floor(Math.random() * users.length);
-                const spinDistance = (totalItems - users.length + winnerIndex) * -80; // Ensure consistent spin
-                reel1.style.transition = 'transform 4s cubic-bezier(0.25, 1, 0.5, 1)'; // Smooth and long animation
+                const spinDistance = (totalItems - users.length + winnerIndex) * -80;
+                reel1.style.transition = 'transform 4s cubic-bezier(0.25, 1, 0.5, 1)';
                 reel1.style.transform = `translateY(${spinDistance}px)`;
 
-                // Select a winner after animation ends
                 setTimeout(() => {
                     const winner = users[winnerIndex];
 
-                    // Update the reel to show only the winner
                     reel1.innerHTML = '';
                     const winnerDiv = document.createElement('div');
                     winnerDiv.className = 'reel-item';
-                    winnerDiv.textContent = winner.id; // Displaying Mã nhân sự
+                    winnerDiv.textContent = winner.id;
                     reel1.appendChild(winnerDiv);
 
-                    alert(`Winner of ${currentPrize}: \nMã nhân sự: ${winner.id}\nHọ và tên: ${winner.name || ''}\nChức danh: ${winner.position || ''}\nBộ phận: ${winner.department || ''}\nĐơn vị: ${winner.unit || ''}\nPhần thưởng: ${currentPrizeReward}`);
+                    winnerDetails.innerHTML = `
+                        <p>Mã nhân sự: ${winner.id}</p>
+                        <p>Họ và tên: ${winner.name}</p>
+                        <p>Chức danh: ${winner.position}</p>
+                        <p>Bộ phận: ${winner.department}</p>
+                        <p>Đơn vị: ${winner.unit}</p>
+                        <p>Phần thưởng: ${currentPrizeReward}</p>
+                    `;
+                    winnerModal.classList.remove('hidden');
 
-                    // Remove winner from the users list
                     users = users.filter(user => user.id !== winner.id);
 
-                    remainingSpins -= 1; // Decrement remaining spins
-                    prizeData[prizeSelect.value] = remainingSpins; // Update prizeData
+                    remainingSpins -= 1;
+                    prizeData[prizeSelect.value] = remainingSpins;
                     spinButton.textContent = remainingSpins > 0 ? currentPrize : `${currentPrize} đã hết`;
                     spinButton.disabled = remainingSpins <= 0;
-                }, 4000); // Match animation duration
-            }, 50); // Ensure transform reset is applied
+                }, 4000);
+            }, 50);
         };
 
         spinButton.addEventListener('click', spinSlot);
+        closeModal.addEventListener('click', () => {
+            winnerModal.classList.add('hidden');
+        });
     </script>
 </body>
 
