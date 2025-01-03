@@ -56,9 +56,16 @@ prizeSelect.addEventListener('change', (event) => {
     currentPrize = selectedOption.text.split(' - ')[0].split(' (')[0];
     remainingSpins = prizeData[prizeKey];
     currentPrizeReward = selectedOption.getAttribute('data-prize');
+
+    // Xóa nội dung hiển thị người thắng trước đó
+    reel1.innerHTML = '';
+    reel1.style.transform = 'translateY(0)'; // Đặt lại vị trí cuộn về mặc định
+
+    // Cập nhật trạng thái nút quay
     spinButton.textContent = remainingSpins > 0 ? currentPrize : `${currentPrize} đã hết`;
     spinButton.disabled = remainingSpins <= 0;
 });
+
 
 const spinSlot = () => {
     if (remainingSpins <= 0) {
@@ -76,8 +83,7 @@ const spinSlot = () => {
     reel1.innerHTML = ''; // Xóa nội dung hiện tại
 
     // Tạo danh sách đầy đủ mã người dùng để quay
-    const fullReel = Array(20).fill(users).flat();
-    fullReel.forEach(user => {
+    users.forEach(user => {
         const div = document.createElement('div');
         div.className = 'reel-item';
         div.textContent = user.id;
@@ -89,36 +95,40 @@ const spinSlot = () => {
     reel1.style.transform = 'translateY(0)';
 
     setTimeout(() => {
-        const totalItems = fullReel.length;
         const winnerIndex = Math.floor(Math.random() * users.length); // Chọn người chiến thắng ngẫu nhiên
-        const spinDistance = (totalItems - users.length + winnerIndex) * -80; // Khoảng cách cuộn
+        const spinDistance = winnerIndex * -80; // Khoảng cách cuộn (1 dòng = 80px)
 
         // Bắt đầu quay
         reel1.style.transition = 'transform 4s cubic-bezier(0.25, 1, 0.5, 1)';
         reel1.style.transform = `translateY(${spinDistance}px)`;
 
         setTimeout(() => {
-            // Khi cuộn kết thúc, hiển thị duy nhất mã của người chiến thắng
+            // Khi cuộn kết thúc, đặt lại transform để hiển thị đúng vị trí người thắng
             const winner = users[winnerIndex];
 
-            // Xóa tất cả nội dung và chỉ hiển thị mã người thắng
-            reel1.innerHTML = '';
+            // Hiển thị người thắng trong vùng kết quả
+            reel1.style.transition = 'none'; // Tắt animation
+            reel1.style.transform = 'translateY(0)'; // Đặt lại vị trí mặc định
+            reel1.innerHTML = ''; // Xóa danh sách cũ
             const winnerDiv = document.createElement('div');
             winnerDiv.className = 'reel-item';
             winnerDiv.textContent = winner.id;
             reel1.appendChild(winnerDiv);
 
-            // Hiển thị thông tin người thắng
-            winnerDetails.innerHTML = `
-                <p>Mã nhân sự: ${winner.id}</p>
-                <p>Họ và tên: ${winner.name}</p>
-                <p>Chức danh: ${winner.position}</p>
-                <p>Bộ phận: ${winner.department}</p>
-                <p>Đơn vị: ${winner.unit}</p>
-                <p>Phần thưởng: ${currentPrizeReward}</p>
-            `;
-            winnerModal.classList.remove('hidden');
-            main.classList.add('hidden');
+            // Hiển thị thông tin chi tiết người thắng trong modal sau vài giây
+            setTimeout(() => {
+                winnerDetails.innerHTML = `
+                    <p>Mã nhân sự: ${winner.id}</p>
+                    <p>Họ và tên: ${winner.name}</p>
+                    <p>Chức danh: ${winner.position}</p>
+                    <p>Bộ phận: ${winner.department}</p>
+                    <p>Đơn vị: ${winner.unit}</p>
+                    <p>Phần thưởng: ${currentPrizeReward}</p>
+                `;
+                winnerModal.classList.remove('hidden');
+                main.classList.add('hidden');
+            }, 3000);
+
             // Loại người thắng khỏi danh sách
             users = users.filter(user => user.id !== winner.id);
 
