@@ -8,17 +8,93 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
+        .custom-file-input {
+            display: none;
+        }
+
+        .file-label {
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .file-label img {
+            width: 150px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        body {
+            background-image: url('./image/bg.png');
+            background-size: cover;
+        }
+
+        .lucky-draw {
+            position: relative;
+            background-image: url('./image/bg-lucky.png');
+            background-size: cover;
+            width: 1200px;
+            height: 583.25px;
+        }
+
+        /* Thiết kế chính của dropdown */
+        .custom-select {
+            width: 100%;
+            padding: 15px;
+            background-color: #002400;
+            /* Nền màu xanh đậm */
+            color: #ffd700;
+            /* Màu chữ vàng */
+            font-size: 25px;
+            font-weight: bold;
+            border: 3px solid #34ff00;
+            /* Viền màu xanh lá */
+            border-radius: 25px;
+            /* Bo góc */
+            box-shadow: 0 0 10px rgba(52, 255, 0, 0.6);
+            /* Hiệu ứng ánh sáng */
+            appearance: none;
+            /* Loại bỏ phong cách mặc định của trình duyệt */
+            background-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23ffd700" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"%3E%3Cpath d="M6 9l6 6 6-6"%3E%3C/path%3E%3C/svg%3E');
+            /* Mũi tên dropdown */
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            background-size: 20px;
+            cursor: pointer;
+        }
+
+        /* Hover và Focus */
+        .custom-select:hover {
+            border-color: #ffea00;
+            /* Đổi màu viền khi hover */
+            box-shadow: 0 0 15px rgba(255, 234, 0, 0.8);
+            /* Tăng sáng khi hover */
+        }
+
+        .custom-select:focus {
+            outline: none;
+            /* Bỏ viền mặc định */
+            border-color: #ffea00;
+            box-shadow: 0 0 15px rgba(255, 234, 0, 1);
+        }
+
         .slot-reel {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: start;
-            height: 80px;
+            height: 130px;
             width: 100%;
+            background-color: #002400;
+            /* Nền màu xanh đậm */
+            border: 2px solid #ffea00;
+            /* Viền vàng */
+            border-radius: 50px;
+            /* Bo góc */
+            box-shadow: 0 0 20px rgba(255, 234, 0, 0.7), 0 0 40px rgba(255, 234, 0, 0.4);
+            /* Hiệu ứng ánh sáng */
             overflow: hidden;
-            border: 4px solid #FBBF24;
-            border-radius: 10px;
-            background-color: #1F2937;
         }
 
         .reel-content {
@@ -28,111 +104,140 @@
         }
 
         .reel-item {
-            font-size: 1.5rem;
+            font-size: 50px;
             font-weight: bold;
-            color: #FBBF24;
+            color: #fff;
             text-align: center;
             height: 80px;
-            line-height: 80px;
+            line-height: 130px;
         }
 
-        .custom-file-input {
-            display: none;
+        #winnerModal .winner {
+            position: relative;
         }
 
-        .file-label {
-            display: inline-block;
-            padding: 0.5rem 1rem;
-            background-color: #FBBF24;
-            color: #1F2937;
-            font-weight: bold;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
+        #winnerModal #winnerDetails {
+            position: absolute;
+            top: 44%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 40px;
+            color: #fff;
+            font-weight: normal;
+            text-align: center;
+            width: 1000px;
         }
 
-        .file-label:hover {
-            background-color: #FFD700;
+        #closeModal {
+            position: absolute;
+            top: 68%;
+            left: 50%;
+            transform: translate(-50%, -50%);
         }
 
-        .hidden {
-            display: none;
+        #closeModal img {
+            width: 167px;
         }
     </style>
 </head>
 
-<body class="bg-gray-900 text-white flex items-center justify-center min-h-screen">
-    <div class="w-full max-w-lg p-6 bg-gray-800 rounded-lg shadow-lg">
-        <h1 class="text-3xl font-bold text-center mb-6 text-yellow-400">🎰 Spin Lucky 🎰</h1>
+<body class="text-white flex justify-center min-h-screen">
+    <div class="mt-10">
+        <div id="main">
+            <div class="flex justify-center">
+                <img src="./image/quay-so-trung-thuong.png" alt="" class="w-[800px]">
+            </div>
+            <div class="lucky-draw pt-[50px] px-[120px]">
+                <!-- <img src="./image/bg-lucky.png" alt="" class="w-[1000px]"> -->
 
-        <label for="fileInput" id="fileLabel" class="file-label mb-4">Chọn tệp</label>
-        <input type="file" id="fileInput" class="custom-file-input" />
+                <div class=" mt-[50px]">
+                    <div class="flex justify-center">
+                        <label for="fileInput" id="fileLabel" class="file-label mb-4">
+                            <img src="./image/btn-chon-tep.png" alt="">
+                        </label>
+                    </div>
+                    <div class="flex justify-center">
+                        <label for="prizeSelect" class="block mb-4 font-bold text-yellow-400 w-[350px]">
+                            <img src="./image/chon-giai-thuong.png" alt="">
+                        </label>
+                    </div>
+                </div>
 
-        <div class="mb-4">
-            <label for="prizeSelect" class="block mb-2 font-bold text-yellow-400">Chọn giải thưởng:</label>
-            <select id="prizeSelect" class="w-full p-2 bg-gray-700 text-yellow-400 font-bold rounded-lg">
-                <option value="special1" data-count="1" data-prize="iPhone 16 Pro Max 256GB">Đặc biệt (1 giải) - iPhone
-                    16 Pro Max</option>
-                <option value="special2" data-count="1" data-prize="TV Sam Sung">Đặc biệt (1 giải) - TV Sam Sung
-                </option>
-                <option value="firstPrize" data-count="1" data-prize="Tủ lạnh">Giải nhất (1 giải) - Tủ lạnh</option>
-                <option value="secondPrize" data-count="2" data-prize="Máy hút bụi">Giải nhì (2 giải) - Máy hút bụi
-                </option>
-                <option value="thirdPrize" data-count="3" data-prize="Nồi chiên không dầu">Giải ba (3 giải) - Nồi chiên
-                    không dầu</option>
-                <option value="luckyPrize" data-count="3" data-prize="Sạc dự phòng">May mắn (3 giải) - Sạc dự phòng
-                </option>
-                <option value="fortunePrize" data-count="3" data-prize="Nồi cơm điện">Phát Tài (3 giải) - Nồi cơm điện
-                </option>
-                <option value="blessingPrize" data-count="4" data-prize="Bộ nồi SunHouse">Phát Lộc (4 giải) - Bộ nồi
-                    SunHouse</option>
-            </select>
-        </div>
+                <input type="file" id="fileInput" class="custom-file-input" />
 
-        <div class="flex justify-center gap-4 mb-6">
-            <div id="reel1" class="slot-reel">
-                <div class="reel-content">
+                <div class="mb-6 mt-4">
+                    <select id="prizeSelect" class="custom-select">
+                        <option value="special1" data-count="1" data-prize="iPhone 16 Pro Max 256GB">Đặc biệt (1 giải) -
+                            iPhone 16 Pro Max 256GB
+                        </option>
+                        <option value="firstPrize" data-count="1" data-prize="Tivi Samsung Qled 4K 65 Inch  ">Giải nhất
+                            (1 giải) - Tivi Samsung
+                            Qled 4K 65 Inch
+                        </option>
+                        <option value="secondPrize" data-count="1" data-prize="Tủ lạnh Samsung">Giải nhì (1 giải) - Tủ
+                            lạnh
+                            Samsung
+                        </option>
+                        <option value="phu_quy" data-count="2" data-prize="Robot hút bụi Xiaomi">Phú Quý (2 giải) -
+                            Robot hút bụi Xiaomi
+                        </option>
+                        <option value="phat_loc" data-count="3" data-prize="Nồi chiên không dầu Gaabor 5L">Phát Lộc (3
+                            giải) - Nồi chiên không dầu Gaabor 5L</option>
+                        <option value="phat_tai" data-count="3" data-prize="Pin sạc dự phòng Energizer">Phát Tài (3
+                            giải) - Pin sạc dự phòng Energizer
+                        </option>
+                        <option value="cat_tuong" data-count="3" data-prize="Nồi cơm điện Cuckoo 1.8l">Cát Tường (3
+                            giải) - Nồi cơm điện Cuckoo 1.8l</option>
+                        <option value="nhu_y" data-count="4" data-prize="Bộ nồi SunHouse">Như Ý (4
+                            giải) - Bộ nồi SunHouse
+                        </option>
+                    </select>
+
+                </div>
+
+                <div class="flex justify-center gap-4 mb-6">
+                    <div id="reel1" class="slot-reel">
+                        <div class="reel-content">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-center">
+                    <button id="spinButton"
+                        class="w-[350px] py-3 bg-[#FFFF00] text-gray-900 font-bold rounded-[50px] transition duration-300 ease-in-out hidden text-[25px]">Đặc
+                        biệt</button>
                 </div>
             </div>
         </div>
 
-        <button id="spinButton"
-            class="w-full py-3 bg-yellow-500 text-gray-900 font-bold rounded-lg hover:bg-yellow-400 transition duration-300 ease-in-out hidden">Đặc
-            biệt</button>
-    </div>
-
-    <div id="winnerModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
-        <div class="bg-gray-800 p-6 rounded-lg text-center max-w-md w-full">
-            <h2 class="text-xl font-bold text-yellow-400 mb-4">🎉 Winner! 🎉</h2>
-            <p id="winnerDetails" class="text-white mb-6"></p>
-            <button id="closeModal"
-                class="px-4 py-2 bg-yellow-500 text-gray-900 font-bold rounded-lg hover:bg-yellow-400 transition">Close</button>
+        <div id="winnerModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+            <div class="p-6 rounded-lg text-cente winner mt-[100px]">
+                <img src="./image/modal-winer.png" alt="" class="w-[1600px]">
+                <p id="winnerDetails" class="text-white mb-6"></p>
+                <button id="closeModal" class="px-4 py-2 transition">
+                    <img src="./image/image-close-modal.png" alt="">
+                </button>
+            </div>
         </div>
     </div>
-
-    <audio id="spinAudio" src="https://sconnect.com.vn/wp-content/uploads/2024/01/Nhac-1.mp3" preload="auto"></audio>
-    <audio id="winAudio" src="https://cdn.pixabay.com/download/audio/2022/03/10/audio_c7990c71b9.mp3"
-        preload="auto"></audio>
 
     <script>
         let users = [];
         const prizeData = {
             special1: 1,
-            special2: 1,
             firstPrize: 1,
-            secondPrize: 2,
+            secondPrize: 1,
             thirdPrize: 3,
-            luckyPrize: 3,
-            fortunePrize: 3,
-            blessingPrize: 4
+            phu_quy: 2,
+            phat_loc: 3,
+            phat_tai: 3,
+            cat_tuong: 3,
+            nhu_y: 4
         };
 
         let currentPrize = "Đặc biệt";
         let remainingSpins = 1;
         let currentPrizeReward = "iPhone 16 Pro Max 256GB";
-
-        const spinAudio = document.getElementById('spinAudio');
-        const winAudio = document.getElementById('winAudio');
 
         document.getElementById('fileInput').addEventListener('change', (event) => {
             const file = event.target.files[0];
@@ -167,6 +272,7 @@
         const winnerModal = document.getElementById('winnerModal');
         const winnerDetails = document.getElementById('winnerDetails');
         const closeModal = document.getElementById('closeModal');
+        const main = document.getElementById('main');
 
         prizeSelect.addEventListener('change', (event) => {
             const selectedOption = event.target.options[event.target.selectedIndex];
@@ -189,12 +295,11 @@
                 return;
             }
 
-            spinAudio.play();
-
             spinButton.disabled = true;
 
-            reel1.innerHTML = '';
+            reel1.innerHTML = ''; // Xóa nội dung hiện tại
 
+            // Tạo danh sách đầy đủ mã người dùng để quay
             const fullReel = Array(20).fill(users).flat();
             fullReel.forEach(user => {
                 const div = document.createElement('div');
@@ -203,50 +308,58 @@
                 reel1.appendChild(div);
             });
 
+            // Đặt vị trí ban đầu của cuộn
             reel1.style.transition = 'none';
             reel1.style.transform = 'translateY(0)';
 
             setTimeout(() => {
                 const totalItems = fullReel.length;
-                const winnerIndex = Math.floor(Math.random() * users.length);
-                const spinDistance = (totalItems - users.length + winnerIndex) * -80;
+                const winnerIndex = Math.floor(Math.random() * users.length); // Chọn người chiến thắng ngẫu nhiên
+                const spinDistance = (totalItems - users.length + winnerIndex) * -80; // Khoảng cách cuộn
+
+                // Bắt đầu quay
                 reel1.style.transition = 'transform 4s cubic-bezier(0.25, 1, 0.5, 1)';
                 reel1.style.transform = `translateY(${spinDistance}px)`;
 
                 setTimeout(() => {
+                    // Khi cuộn kết thúc, hiển thị duy nhất mã của người chiến thắng
                     const winner = users[winnerIndex];
 
+                    // Xóa tất cả nội dung và chỉ hiển thị mã người thắng
                     reel1.innerHTML = '';
                     const winnerDiv = document.createElement('div');
                     winnerDiv.className = 'reel-item';
                     winnerDiv.textContent = winner.id;
                     reel1.appendChild(winnerDiv);
 
-                    winAudio.play();
-
+                    // Hiển thị thông tin người thắng
                     winnerDetails.innerHTML = `
-                        <p>Mã nhân sự: ${winner.id}</p>
-                        <p>Họ và tên: ${winner.name}</p>
-                        <p>Chức danh: ${winner.position}</p>
-                        <p>Bộ phận: ${winner.department}</p>
-                        <p>Đơn vị: ${winner.unit}</p>
-                        <p>Phần thưởng: ${currentPrizeReward}</p>
-                    `;
+                <p>Mã nhân sự: ${winner.id}</p>
+                <p>Họ và tên: ${winner.name}</p>
+                <p>Chức danh: ${winner.position}</p>
+                <p>Bộ phận: ${winner.department}</p>
+                <p>Đơn vị: ${winner.unit}</p>
+                <p>Phần thưởng: ${currentPrizeReward}</p>
+            `;
                     winnerModal.classList.remove('hidden');
-
+                    main.classList.add('hidden');
+                    // Loại người thắng khỏi danh sách
                     users = users.filter(user => user.id !== winner.id);
 
+                    // Cập nhật số lượt còn lại
                     remainingSpins -= 1;
                     prizeData[prizeSelect.value] = remainingSpins;
                     spinButton.textContent = remainingSpins > 0 ? currentPrize : `${currentPrize} đã hết`;
                     spinButton.disabled = remainingSpins <= 0;
-                }, 4000);
+                }, 4000); // Thời gian khớp với animation quay
             }, 50);
         };
+
 
         spinButton.addEventListener('click', spinSlot);
         closeModal.addEventListener('click', () => {
             winnerModal.classList.add('hidden');
+            main.classList.remove('hidden');
         });
     </script>
 </body>
